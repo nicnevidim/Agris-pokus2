@@ -1,44 +1,63 @@
 package com.example.michael.agris_semestralka_clanky;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Michael on 30.11.2014.
  */
-public class ArticlesList{
-    public static List<ArticleItem> ITEMS = new ArrayList<ArticleItem>();
+public class ArticlesList extends ArrayList<ArticleItem> implements Parcelable{
 
-    public static void addArticleItem(ArticleItem item) {
-        ITEMS.add(item);
+    public ArticlesList(){
     }
 
-    public static class ArticleItem{
-        public String id;
-        public String headline;
-        public String perex;
+    public ArticlesList(Parcel in){
+        readFromParcel(in);
+    }
 
-        public ArticleItem(String id, String headline, String perex) {
-            this.id = id;
-            this.headline = headline;
-            this.perex = perex;
+    @SuppressWarnings("unchecked")
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public ArticlesList createFromParcel(Parcel in) {
+            return new ArticlesList(in);
         }
-
-        @Override
-        public String toString() {
-            return headline;
+        public Object[] newArray(int arg0) {
+            return null;
         }
+    };
 
-        public String getId() {
-            return id;
+    private void readFromParcel(Parcel in) {
+        this.clear();
+        //First we have to read the list size
+        int size = in.readInt();
+        //Reading remember that we wrote first the Name and later the Phone Number.
+        //Order is fundamental
+        for (int i = 0; i < size; i++) {
+            ArticleItem article = new ArticleItem();
+            article.setId(in.readString());
+            article.setHeadline(in.readString());
+            article.setPerex(in.readString());
+            this.add(article);
         }
+    }
 
-        public String getHeadline() {
-            return headline;
-        }
+    public int describeContents() {
+       return 0;
+    }
 
-        public String getPerex() {
-            return perex;
+    public void writeToParcel(Parcel dest, int flags) {
+        int size = this.size();
+        //We have to write the list size, we need him recreating the list
+        dest.writeInt(size);
+        //We decided arbitrarily to write first the Name and later the Phone Number.
+        for (int i = 0; i < size; i++) {
+
+            ArticleItem article = this.get(i);
+
+            dest.writeString(article.getId());
+            dest.writeString(article.getHeadline());
+            dest.writeString(article.getPerex());
         }
     }
 }

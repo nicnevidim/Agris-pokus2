@@ -31,7 +31,7 @@ import java.net.URL;
  * interface.
  */
 public class HeadlinesFragment extends ListFragment {
-    private ArticlesList articlesList;
+    private static ArticlesList articlesList;
     private static final String PARCELABLE_KEY="parkey";
     private static final String DEBUG_TAG = "DEBUG_TAG";
     private static final String TAG_CLANKY = "clanky";
@@ -46,10 +46,10 @@ public class HeadlinesFragment extends ListFragment {
     private SimpleAdapter sAdapter;
 
 
-    public static HeadlinesFragment newInstance(ArticlesList articlesList) {
+    public static HeadlinesFragment newInstance(Bundle savedInstanceState) {
         HeadlinesFragment fragment = new HeadlinesFragment();
         Bundle args = new Bundle();
-        args.putParcelable(PARCELABLE_KEY);
+        args.putParcelable(PARCELABLE_KEY,articlesList);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,7 +65,7 @@ public class HeadlinesFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
+            articlesList=savedInstanceState.getParcelable(PARCELABLE_KEY);
         }
         triggerDownload("http://develop.agris.cz/dalsi-novinky?vratmi=json");
 
@@ -100,7 +100,7 @@ public class HeadlinesFragment extends ListFragment {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-            mListener.onFragmentInteraction(ArticlesList.ITEMS.get(position).id);
+            //mListener.onFragmentInteraction(ArticlesList);
         }
     }
 
@@ -177,8 +177,8 @@ public class HeadlinesFragment extends ListFragment {
                         String perex = c.getString(TAG_PEREX);
 
                         // tmp hashmap for single contact
-                        ArticlesList.ArticleItem articleItem=new ArticlesList.ArticleItem(id,headline,perex);
-                        articlesList.addArticleItem(articleItem);
+                        ArticleItem articleItem=new ArticleItem(id,headline,perex);
+                        articlesList.add(articleItem);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -198,8 +198,10 @@ public class HeadlinesFragment extends ListFragment {
             /**
              * Updating parsed JSON data into ListView
              * */
-            mAdapter = new ArrayAdapter<ArticlesList.ArticleItem>(getActivity(),
-                    android.R.layout.two_line_list_item, android.R.id.text1, articlesList.ITEMS);
+
+            ///tady pouyit novej adapter!!!!
+             mAdapter = new ArrayAdapter<ArticlesList>(getActivity(),
+                    android.R.layout.two_line_list_item, android.R.id.text1,articlesList);
             setListAdapter(mAdapter);
 
 
